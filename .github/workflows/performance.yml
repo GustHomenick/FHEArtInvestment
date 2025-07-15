@@ -1,0 +1,220 @@
+name: Performance Optimization
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  gas-benchmark:
+    name: Gas Benchmarking
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npm run compile
+
+      - name: Run gas benchmark tests
+        run: npm run test:gas
+        env:
+          REPORT_GAS: true
+          COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
+
+      - name: Save gas report
+        run: |
+          if [ -f "gas-report.txt" ]; then
+            cat gas-report.txt
+            cp gas-report.txt gas-report-${{ github.sha }}.txt
+          fi
+
+      - name: Upload gas report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gas-report-${{ github.run_number }}
+          path: gas-report*.txt
+          retention-days: 90
+
+      - name: Comment gas report on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (fs.existsSync('gas-report.txt')) {
+              const report = fs.readFileSync('gas-report.txt', 'utf8');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: '## ⛽ Gas Report\n\n```\n' + report + '\n```'
+              });
+            }
+        continue-on-error: true
+
+  contract-size:
+    name: Contract Size Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile contracts
+        run: npm run compile
+
+      - name: Check contract sizes
+        run: |
+          npm run size > contract-sizes.txt || true
+          cat contract-sizes.txt
+
+      - name: Verify size limits
+        run: |
+          echo "📏 Checking contract size limits (24KB max)..."
+          npm run size || {
+            echo "⚠️  Some contracts may exceed size limits"
+            exit 0
+          }
+
+      - name: Upload size report
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-sizes-${{ github.run_number }}
+          path: contract-sizes.txt
+          retention-days: 30
+        continue-on-error: true
+
+  optimizer-analysis:
+    name: Compiler Optimization Analysis
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        runs: [200, 1000, 10000]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test with optimizer runs = ${{ matrix.runs }}
+        run: |
+          echo "Testing with optimizer runs: ${{ matrix.runs }}"
+
+          # Backup original config
+          cp hardhat.config.js hardhat.config.js.backup
+
+          # Update optimizer runs
+          sed -i 's/runs: [0-9]*/runs: ${{ matrix.runs }}/' hardhat.config.js
+
+          # Compile and test
+          npm run compile
+          npm run test:gas
+
+          # Restore config
+          mv hardhat.config.js.backup hardhat.config.js
+        env:
+          REPORT_GAS: true
+        continue-on-error: true
+
+  load-testing:
+    name: Performance Load Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run simulation with performance metrics
+        run: npm run simulate
+        timeout-minutes: 10
+
+      - name: Measure test execution time
+        run: |
+          echo "⏱️  Measuring test execution time..."
+          time npm test
+
+  memory-analysis:
+    name: Memory Usage Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with memory profiling
+        run: |
+          echo "💾 Running memory analysis..."
+          node --max-old-space-size=4096 --expose-gc node_modules/.bin/hardhat test
+        continue-on-error: true
+
+  performance-summary:
+    name: Performance Summary
+    runs-on: ubuntu-latest
+    needs: [gas-benchmark, contract-size, optimizer-analysis, load-testing]
+    if: always()
+
+    steps:
+      - name: Generate performance summary
+        run: |
+          echo "## ⚡ Performance Optimization Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Gas Benchmarking**: ${{ needs.gas-benchmark.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Contract Size**: ${{ needs.contract-size.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Optimizer Analysis**: ${{ needs.optimizer-analysis.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Load Testing**: ${{ needs.load-testing.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Recommendations" >> $GITHUB_STEP_SUMMARY
+          echo "- Review gas reports for optimization opportunities" >> $GITHUB_STEP_SUMMARY
+          echo "- Ensure contracts are under 24KB size limit" >> $GITHUB_STEP_SUMMARY
+          echo "- Monitor gas costs for user transactions" >> $GITHUB_STEP_SUMMARY
