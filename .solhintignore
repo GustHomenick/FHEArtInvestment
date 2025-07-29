@@ -1,0 +1,8 @@
+# directories
+**/artifacts
+**/cache
+**/node_modules
+**/coverage
+
+# files
+**/LocalFHE.sol
