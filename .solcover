@@ -1,0 +1,10 @@
+module.exports = {
+  skipFiles: [
+    'LocalFHE.sol',
+    'test/',
+    'mock/'
+  ],
+  mocha: {
+    timeout: 100000
+  }
+};
