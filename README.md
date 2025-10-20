@@ -2,8 +2,7 @@
 
 > Privacy-Protected Art Collection Investment Using FHE Encryption Technology
 
-[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://private-art-investment.vercel.app/)
-[![Contract](https://img.shields.io/badge/contract-verified-blue)](https://sepolia.etherscan.io/address/0xa0eE56B7697846877d0E90FA654377dcDD68Aaa8)
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://fhe-art-investment.vercel.app/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ## 🎨 Overview
@@ -12,11 +11,11 @@ The Private Art Investment Platform revolutionizes art investment by combining b
 
 ### Live Application
 
-🌐 **Website**: [https://private-art-investment.vercel.app/](https://private-art-investment.vercel.app/)
+🌐 **Website**: [https://fhe-art-investment.vercel.app/](https://fhe-art-investment.vercel.app/)
 
-📜 **Smart Contract**: `0xa0eE56B7697846877d0E90FA654377dcDD68Aaa8` (Sepolia Testnet)
+🔗 **GitHub Repository**: [https://github.com/GustHomenick/FHEArtInvestment](https://github.com/GustHomenick/FHEArtInvestment)
 
-🔗 **GitHub Repository**: [https://github.com/GustHomenick/PrivateArtInvestment](https://github.com/GustHomenick/PrivateArtInvestment)
+🎥 **Demo Video**: Download and watch `demo.mp4` from the repository (video cannot be viewed directly via link)
 
 ## 🔐 Core Concepts
 
@@ -31,14 +30,54 @@ Our platform leverages FHE technology to ensure investor privacy while maintaini
   - Returns distribution based on encrypted share amounts
   - Investment statistics aggregation
 
-### Anonymous Art Investment
+### FHE Smart Contracts
+
+The platform uses FHEVM (Fully Homomorphic Encryption Virtual Machine) to enable confidential smart contracts:
+
+```solidity
+// Investment amounts are encrypted on-chain
+mapping(uint256 => mapping(address => euint64)) private investments;
+
+// Only the investor can decrypt their own amounts
+function getMyInvestment(uint256 artworkId)
+    public view returns (bytes memory) {
+    return TFHE.reencrypt(investments[artworkId][msg.sender], msg.sender);
+}
+```
+
+**Key Features of FHE Contracts**:
+- **Confidential State**: Contract state variables can be encrypted (`euint64`, `euint32`, etc.)
+- **Encrypted Operations**: Perform calculations on encrypted data (addition, multiplication, comparison)
+- **Selective Decryption**: Only authorized users can decrypt specific values
+- **On-Chain Privacy**: Privacy guarantees are enforced at the blockchain level, not just application layer
+
+### Anonymous Art Investment - Privacy Art Collection
 
 Traditional art investment platforms expose investor information publicly. Our FHE-powered solution addresses this privacy concern:
 
-1. **Investment Privacy**: Your investment amount remains confidential - only you can decrypt and view your holdings
+#### Why Privacy Matters in Art Investment
+
+1. **Investment Strategy Protection**: High-value investors don't want to reveal their portfolio composition
+2. **Market Manipulation Prevention**: Hidden investment amounts prevent front-running and price manipulation
+3. **Personal Security**: Wealthy collectors maintain anonymity for safety reasons
+4. **Competitive Advantage**: Institutional investors keep their art investment strategies confidential
+
+#### How We Achieve Privacy
+
+1. **Investment Privacy**: Your investment amount remains confidential - only you can decrypt and view your holdings using EIP-712 signatures
 2. **Portfolio Confidentiality**: Total portfolio value is computed homomorphically, keeping individual investments private
 3. **Transparent Verification**: Despite encryption, all transactions are verifiable on-chain, ensuring authenticity
 4. **Fair Returns Distribution**: Returns are distributed proportionally based on encrypted share amounts using FHE computation
+
+#### Privacy Architecture
+
+```
+Investor → Encrypt Investment → Smart Contract (FHE) → Blockchain
+                                        ↓
+                              Homomorphic Operations
+                                        ↓
+                              Encrypted Results ← Decrypt (with signature) ← Investor
+```
 
 ## 🎭 Key Features
 
@@ -48,199 +87,414 @@ Traditional art investment platforms expose investor information publicly. Our F
 - **Confidential Investments**: Invest in artworks with fully encrypted transaction amounts
 - **Portfolio Privacy**: View your own portfolio while keeping it hidden from others
 - **Secure Returns**: Receive proportional returns based on your encrypted shareholdings
+- **EIP-712 Decryption**: Authorize decryption of your data using cryptographic signatures
 
-### For Art Curators
+### For Platform
 
-- **Artwork Listing**: List high-value artworks with fractional share offerings
-- **IPFS Integration**: Store artwork metadata and images on decentralized storage
-- **Investor Management**: Track total investor count while respecting individual privacy
-- **Returns Distribution**: Distribute profits to investors using FHE-based calculations
+- **Artwork Listing**: List valuable artworks with pricing and metadata
+- **Transparent Operations**: All operations are verifiable on-chain
+- **Automated Returns**: Distribute returns automatically based on encrypted shareholdings
+- **FHE Security**: Leverage cryptographic guarantees for data privacy
 
-### Platform Security
+### For Smart Contracts
 
-- **On-Chain Encryption**: All sensitive data encrypted at the smart contract level
-- **Access Control**: Granular permissions using FHE access control lists (ACL)
-- **Decryption Requests**: Secure async decryption for authorized operations only
-- **Cryptographic Signatures**: Multi-signature verification for sensitive operations
-
-## 📊 How It Works
-
-### Investment Flow
-
-```
-1. Connect Wallet (MetaMask) → Sepolia Testnet
-2. Register as Investor → Encrypted profile created
-3. Browse Artwork Gallery → View available fractional shares
-4. Select Artwork & Shares → Choose investment amount
-5. Confirm Transaction → Investment encrypted and recorded
-6. Private Portfolio → View your holdings (only you can see)
-```
-
-### Returns Distribution
-
-```
-1. Artwork Sold/Generates Revenue
-2. Curator Initiates Returns Distribution
-3. FHE Decryption Request → Encrypted shares decrypted securely
-4. Proportional Calculation → Returns computed based on shareholding
-5. Automatic Distribution → Funds transferred to investor wallets
-```
-
-## 🖼️ Demo & Screenshots
-
-### Video Demonstration
-
-*PrivateArtInvestment.mp4 showcases the complete investor journey from registration to receiving returns*
-
-### On-Chain Transactions
-
-Below are real PrivateArtInvestment.png from the Sepolia testnet:
-
+- **FHEVM Integration**: Built on Zama's FHEVM for native encrypted computations
+- **Encrypted State Variables**: Use `euint64`, `euint32`, `ebool` for confidential data
+- **Access Control**: Fine-grained permission system for decryption
+- **Gas Optimized**: Efficient FHE operations for cost-effective transactions
 
 ## 🏗️ Technical Architecture
 
-### Smart Contract Stack
+### Smart Contract Structure
 
-- **Solidity**: Smart contract development (v0.8.24)
-- **FHE Library**: Zama's fhEVM for homomorphic encryption
-- **Network**: Sepolia Ethereum Testnet
-- **Storage**: IPFS for artwork metadata
-
-### Frontend Stack
-
-- **Vanilla JavaScript**: Lightweight and fast
-- **Ethers.js v6**: Ethereum interaction library
-- **Responsive Design**: Mobile-friendly interface
-- **Real-time Updates**: Auto-refresh every 30 seconds
-
-### Encryption Implementation
-
-```solidity
-// Example: Private investment encryption
-struct PrivateInvestment {
-    FHE.euint32 encryptedShares;       // Encrypted share amount
-    FHE.euint32 encryptedValue;        // Encrypted investment value
-    bool hasInvested;
-    uint256 timestamp;
-}
-
-// Homomorphic addition for portfolio calculation
-investorProfiles[msg.sender].encryptedTotalInvestment =
-    FHE.add(currentTotal, encryptedValue);
+```
+PrivateArtInvestment.sol
+├── FHE Operations (TFHE library)
+│   ├── Encrypted investment amounts (euint64)
+│   ├── Encrypted share counts (euint64)
+│   └── Homomorphic calculations
+├── Investor Management
+│   ├── Registration system
+│   ├── Investment tracking
+│   └── Portfolio management
+├── Artwork Management
+│   ├── Listing system
+│   ├── Metadata storage
+│   └── Price management
+└── Returns Distribution
+    ├── Automated calculations
+    ├── Proportional distribution
+    └── Encrypted amount handling
 ```
 
-## 🎯 Use Cases
+### FHE Data Types
 
-### 1. High-Net-Worth Investors
-Invest in blue-chip artworks while maintaining portfolio confidentiality from competitors and public scrutiny.
+| Type | Description | Use Case |
+|------|-------------|----------|
+| `euint8` | 8-bit encrypted integer | Small counters, flags |
+| `euint16` | 16-bit encrypted integer | Medium values |
+| `euint32` | 32-bit encrypted integer | Large values |
+| `euint64` | 64-bit encrypted integer | Investment amounts, balances |
+| `ebool` | Encrypted boolean | Access flags, status |
+| `eaddress` | Encrypted address | Private recipient addresses |
 
-### 2. Institutional Buyers
-Art funds and investment firms can diversify portfolios without revealing strategy or holdings to market.
+### Technology Stack
 
-### 3. Privacy-Conscious Collectors
-Individual collectors who value privacy can participate in fractional art ownership anonymously.
+**Blockchain Layer**:
+- **FHEVM**: Zama's Fully Homomorphic Encryption Virtual Machine
+- **Solidity**: Smart contract language with FHE extensions
+- **TFHE Library**: Torus Fully Homomorphic Encryption operations
 
-### 4. Emerging Artists
-Up-and-coming artists can attract investment while protecting early supporter identities.
+**Development Tools**:
+- **Hardhat**: Smart contract development framework
+- **Ethers.js v6**: Blockchain interaction library
+- **fhevmjs**: JavaScript library for FHE client-side encryption
 
-## 🔒 Privacy Guarantees
+**Frontend**:
+- **Next.js 14**: React framework with App Router
+- **TypeScript**: Type-safe development
+- **TailwindCSS**: Utility-first styling
+- **Wagmi v2**: React hooks for Ethereum
+- **Viem**: Modern Ethereum library
 
-### What is Private?
+**Testing & Deployment**:
+- **Mocha/Chai**: Testing framework
+- **Hardhat Network**: Local development blockchain
+- **Sepolia Testnet**: Ethereum test network
+- **Vercel**: Frontend hosting
 
-✅ **Your investment amounts**: Fully encrypted using FHE
-✅ **Your share quantities**: Encrypted on-chain
-✅ **Your portfolio value**: Homomorphically computed, remains encrypted
-✅ **Your transaction history**: Amounts encrypted, only you can decrypt
+## 📦 Project Structure
 
-### What is Public?
+```
+private-art-investment/
+├── contracts/
+│   ├── PrivateArtInvestment.sol    # Main FHE contract
+│   └── interfaces/
+├── scripts/
+│   ├── deploy.js                   # Deployment script
+│   ├── verify.js                   # Contract verification
+│   ├── interact.js                 # Contract interaction
+│   └── simulate.js                 # Simulation script
+├── test/
+│   └── PrivateArtInvestment.test.js
+├── app/                            # Next.js application
+│   ├── page.tsx                    # Main page
+│   ├── layout.tsx                  # Root layout
+│   └── components/                 # React components
+├── lib/
+│   ├── fhevm.ts                    # FHEVM client setup
+│   └── contract.ts                 # Contract utilities
+├── hardhat.config.js               # Hardhat configuration
+└── package.json
+```
 
-📖 **Artwork listings**: Names, artists, total value, share prices
-📖 **Total statistics**: Number of artworks, total registered investors
-📖 **Transaction existence**: That a transaction occurred (not the amount)
-📖 **Your participation**: That you invested in a specific artwork (not how much)
-
-## 🌟 Benefits
-
-### Privacy
-- Zero-knowledge investment amounts
-- Encrypted portfolio holdings
-- Confidential returns distribution
-- Protected investor identities
-
-### Security
-- Blockchain immutability
-- Smart contract automation
-- Multi-signature verification
-- Decentralized storage (IPFS)
-
-### Accessibility
-- Fractional ownership
-- Lower investment barriers
-- Global participation
-- 24/7 availability
-
-### Transparency
-- Verifiable on-chain transactions
-- Auditable smart contract code
-- Artwork provenance tracking
-- Fair returns calculation
-
-## 📱 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- MetaMask wallet extension
-- Sepolia ETH for gas fees ([Faucet](https://sepoliafaucet.com/))
-- Modern web browser (Chrome, Firefox, Brave)
+- Node.js >= 18.0.0
+- npm or yarn
+- MetaMask wallet
+- Sepolia testnet ETH
 
-### Quick Start
+### Installation
 
-1. Visit [https://private-art-investment.vercel.app/](https://private-art-investment.vercel.app/)
-2. Connect your MetaMask wallet
-3. Switch to Sepolia testnet
-4. Register as an investor
-5. Browse artwork gallery
-6. Make your first private investment!
+```bash
+# Clone repository
+git clone https://github.com/GustHomenick/FHEArtInvestment.git
+cd FHEArtInvestment
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+### Smart Contract Development
+
+```bash
+# Compile contracts
+npm run compile
+
+# Run tests
+npm test
+
+# Deploy to Sepolia
+npm run deploy
+
+# Verify on Etherscan
+npm run verify
+```
+
+### Frontend Development
+
+```bash
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env` file with the following variables:
+
+```env
+# Network Configuration
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
+PRIVATE_KEY=your_deployer_private_key
+
+# Frontend Configuration
+NEXT_PUBLIC_CONTRACT_ADDRESS=deployed_contract_address
+NEXT_PUBLIC_CHAIN_ID=11155111
+NEXT_PUBLIC_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
+
+# Optional
+ETHERSCAN_API_KEY=your_etherscan_key
+```
+
+## 📖 Usage Examples
+
+### For Investors
+
+#### 1. Register as Investor
+
+```javascript
+import { ethers } from 'ethers';
+import { createFhevmInstance } from 'fhevmjs';
+
+// Initialize FHEVM
+const instance = await createFhevmInstance({
+  chainId: 11155111,
+  publicKey: await contract.getPublicKey(),
+});
+
+// Register
+const tx = await contract.registerInvestor("Investor Name");
+await tx.wait();
+```
+
+#### 2. Make Private Investment
+
+```javascript
+// Encrypt investment amount (e.g., 0.1 ETH)
+const encryptedAmount = instance.encrypt64(ethers.parseEther("0.1"));
+
+// Invest in artwork
+const tx = await contract.invest(
+  artworkId,
+  encryptedAmount,
+  {
+    value: ethers.parseEther("0.1")
+  }
+);
+await tx.wait();
+```
+
+#### 3. View Private Portfolio
+
+```javascript
+// Get encrypted investment
+const encryptedData = await contract.getMyInvestment(artworkId);
+
+// Decrypt using EIP-712 signature
+const signature = await signer.signTypedData(domain, types, message);
+const decryptedAmount = await decrypt(encryptedData, signature);
+
+console.log(`My investment: ${ethers.formatEther(decryptedAmount)} ETH`);
+```
+
+### For Platform Owner
+
+#### List Artwork
+
+```javascript
+const tx = await contract.listArtwork(
+  artworkId,
+  "Starry Night",
+  "Vincent van Gogh",
+  ethers.parseEther("100") // Artwork value
+);
+await tx.wait();
+```
+
+#### Distribute Returns
+
+```javascript
+const tx = await contract.distributeReturns(
+  artworkId,
+  { value: ethers.parseEther("10") } // Total returns to distribute
+);
+await tx.wait();
+```
+
+## 🔒 Security Features
+
+### FHE Security Guarantees
+
+- **Cryptographic Privacy**: Investment amounts are encrypted using lattice-based cryptography
+- **On-Chain Confidentiality**: Encrypted data stored directly on blockchain
+- **Zero-Knowledge Proofs**: Verify computations without revealing inputs
+- **No Trusted Third Party**: Privacy is guaranteed by mathematics, not trust
+
+### Access Control
+
+- **Role-Based Permissions**: Owner, investor, and public access levels
+- **Encrypted ACL**: Access control lists stored in encrypted form
+- **EIP-712 Signatures**: Secure authorization for decryption requests
+- **Time-Locked Operations**: Prevent unauthorized early access
+
+### Smart Contract Security
+
+- **Audited FHE Operations**: Using Zama's audited TFHE library
+- **Reentrancy Protection**: OpenZeppelin's ReentrancyGuard
+- **Input Validation**: Comprehensive parameter checking
+- **Emergency Pause**: Circuit breaker for emergency situations
+
+## 🧪 Testing
+
+### Run Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
+npm run coverage
+
+# Run specific test file
+npx hardhat test test/PrivateArtInvestment.test.js
+```
+
+### Test Coverage
+
+- ✅ Investor registration and management
+- ✅ Artwork listing and updates
+- ✅ Private investment operations
+- ✅ FHE encryption and decryption
+- ✅ Returns distribution calculations
+- ✅ Access control and permissions
+- ✅ Edge cases and error handling
+
+## 📊 Smart Contract API
+
+### Main Functions
+
+#### Investor Functions
+
+```solidity
+// Register as investor
+function registerInvestor(string memory name) external
+
+// Invest in artwork (encrypted amount)
+function invest(
+    uint256 artworkId,
+    bytes calldata encryptedAmount
+) external payable
+
+// Get own investment (encrypted)
+function getMyInvestment(uint256 artworkId)
+    external view returns (bytes memory)
+
+// Get total portfolio value (encrypted)
+function getTotalPortfolioValue()
+    external view returns (bytes memory)
+```
+
+#### Owner Functions
+
+```solidity
+// List new artwork
+function listArtwork(
+    uint256 artworkId,
+    string memory title,
+    string memory artist,
+    uint256 value
+) external onlyOwner
+
+// Distribute returns
+function distributeReturns(uint256 artworkId)
+    external payable onlyOwner
+```
+
+#### View Functions
+
+```solidity
+// Get artwork details
+function getArtwork(uint256 artworkId)
+    external view returns (Artwork memory)
+
+// Check if address is investor
+function isInvestor(address account)
+    external view returns (bool)
+
+// Get investor details
+function getInvestor(address account)
+    external view returns (Investor memory)
+```
+
+## 🎓 Learn More
+
+### FHE Resources
+
+- [Zama Documentation](https://docs.zama.ai/)
+- [FHEVM Whitepaper](https://github.com/zama-ai/fhevm/blob/main/fhevm-whitepaper.pdf)
+- [TFHE-rs Library](https://github.com/zama-ai/tfhe-rs)
+
+### Project Resources
+
+- [GitHub Repository](https://github.com/GustHomenick/FHEArtInvestment)
+- [Live Application](https://fhe-art-investment.vercel.app/)
+- [Technical Documentation](./docs/TECHNICAL.md)
+
+### Video Tutorial
+
+📹 **Demo Video**: Download `demo.mp4` from the GitHub repository to watch the complete platform demonstration. The video covers:
+- Platform overview and features
+- Investor registration process
+- Making private investments
+- Viewing encrypted portfolio
+- Returns distribution
+- Technical architecture
+
+*Note: The demo video must be downloaded to watch - direct links will not work.*
 
 ## 🤝 Contributing
 
-We welcome contributions to improve the Private Art Investment Platform! Here's how you can help:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- 🐛 Report bugs and issues
-- 💡 Suggest new features
-- 📖 Improve documentation
-- 🔧 Submit pull requests
-
-Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🔗 Links
-
-- **Live Application**: [https://private-art-investment.vercel.app/](https://private-art-investment.vercel.app/)
-- **GitHub Repository**: [https://github.com/GustHomenick/PrivateArtInvestment](https://github.com/GustHomenick/PrivateArtInvestment)
-- **Smart Contract**: [0xa0eE56B7697846877d0E90FA654377dcDD68Aaa8](https://sepolia.etherscan.io/address/0xa0eE56B7697846877d0E90FA654377dcDD68Aaa8)
-- **Zama fhEVM Docs**: [https://docs.zama.ai/fhevm](https://docs.zama.ai/fhevm)
-
-## 💬 Support
-
-For questions, feedback, or support:
-
-- 📧 Open an issue on [GitHub](https://github.com/GustHomenick/PrivateArtInvestment/issues)
-- 💬 Join our community discussions
-- 📚 Read the [documentation](https://github.com/GustHomenick/PrivateArtInvestment/wiki)
-
 ## 🙏 Acknowledgments
 
-- **Zama**: For providing the FHE encryption library (fhEVM)
-- **Ethereum Foundation**: For Sepolia testnet infrastructure
-- **IPFS**: For decentralized storage solutions
-- **Open Source Community**: For invaluable tools and libraries
+- **Zama** - For developing FHEVM and TFHE technology
+- **OpenZeppelin** - For secure smart contract libraries
+- **Hardhat** - For excellent development tools
+- **Ethereum Foundation** - For the blockchain infrastructure
+
+## 📞 Contact & Support
+
+- **GitHub Issues**: [Report bugs or request features](https://github.com/GustHomenick/FHEArtInvestment/issues)
+- **Discussions**: [Join community discussions](https://github.com/GustHomenick/FHEArtInvestment/discussions)
 
 ---
 
-**Built with ❤️ for privacy-conscious art investors**
+**Built with ❤️ for privacy-preserving art investment**
 
-*Combining the transparency of blockchain with the privacy of homomorphic encryption*
+*Powered by Zama FHEVM • Deployed on Ethereum Sepolia • Hosted on Vercel*
