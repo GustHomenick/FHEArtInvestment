@@ -9,9 +9,24 @@
 
 The Private Art Investment Platform revolutionizes art investment by combining blockchain transparency with Fully Homomorphic Encryption (FHE) technology. This platform enables investors to purchase fractional shares of valuable artworks while maintaining complete privacy of their investment amounts and portfolio holdings.
 
+### 🚀 Two Versions Available
+
+This project is available in **two technology stacks** to suit different development needs:
+
+1. **Next.js Version** (Advanced) - Full-stack application with SSR and API routes
+   - 🌐 **Live Demo**: [https://fhe-art-investment.vercel.app/](https://fhe-art-investment.vercel.app/)
+   - 📍 **Location**: Root directory
+   - 🎯 **Best for**: Production deployments, SEO, complex applications
+
+2. **React + Vite Version** (Standalone) - Lightweight SPA with fast development
+   - 📍 **Location**: `PrivateArtInvestment/` directory
+   - 🎯 **Best for**: Quick prototyping, learning, simple deployments
+
+Both versions provide the **same core functionality** with identical smart contracts and FHEVM integration.
+
 ### Live Application
 
-🌐 **Website**: [https://fhe-art-investment.vercel.app/](https://fhe-art-investment.vercel.app/)
+🌐 **Next.js Demo**: [https://fhe-art-investment.vercel.app/](https://fhe-art-investment.vercel.app/)
 
 🔗 **GitHub Repository**: [https://github.com/GustHomenick/FHEArtInvestment](https://github.com/GustHomenick/FHEArtInvestment)
 
@@ -148,23 +163,37 @@ PrivateArtInvestment.sol
 **Development Tools**:
 - **Hardhat**: Smart contract development framework
 - **Ethers.js v6**: Blockchain interaction library
-- **fhevmjs**: JavaScript library for FHE client-side encryption
+- **fhevmjs v0.5.0**: JavaScript library for FHE client-side encryption
+- **@fhevm/sdk**: Universal FHEVM SDK for framework-agnostic development
 
-**Frontend**:
+**Frontend - Next.js Version** (Advanced):
 - **Next.js 14**: React framework with App Router
-- **TypeScript**: Type-safe development
-- **TailwindCSS**: Utility-first styling
-- **Wagmi v2**: React hooks for Ethereum
-- **Viem**: Modern Ethereum library
+- **TypeScript 5**: Type-safe development
+- **TailwindCSS 3**: Utility-first styling
+- **Wagmi v2.5**: React hooks for Ethereum
+- **Viem v2.7**: Modern Ethereum library
+- **ConnectKit 1.7**: Beautiful wallet connection UI
+- **TanStack Query 5**: Async state management
+
+**Frontend - React Version** (Standalone):
+- **React 18.2**: Modern React with hooks
+- **TypeScript 5.2**: Type-safe development
+- **Vite 5.0**: Lightning-fast build tool with HMR
+- **Wagmi v2.5**: React hooks for Ethereum
+- **Viem v2.7**: Modern Ethereum library
+- **ConnectKit 1.7**: Wallet connection interface
+- **TanStack Query 5**: Server state management
 
 **Testing & Deployment**:
 - **Mocha/Chai**: Testing framework
 - **Hardhat Network**: Local development blockchain
 - **Sepolia Testnet**: Ethereum test network
-- **Vercel**: Frontend hosting
+- **Vercel**: Frontend hosting (Next.js)
+- **Vite Preview**: Static hosting (React)
 
 ## 📦 Project Structure
 
+### Next.js Version (Advanced)
 ```
 private-art-investment/
 ├── contracts/
@@ -177,14 +206,55 @@ private-art-investment/
 │   └── simulate.js                 # Simulation script
 ├── test/
 │   └── PrivateArtInvestment.test.js
-├── app/                            # Next.js application
+├── app/                            # Next.js 14 App Router
 │   ├── page.tsx                    # Main page
 │   ├── layout.tsx                  # Root layout
-│   └── components/                 # React components
+│   ├── providers.tsx               # Wagmi providers
+│   ├── globals.css                 # Global styles
+│   └── api/                        # API routes
+│       ├── fhe/                    # FHE operations
+│       └── keys/                   # Key management
+├── components/                     # React components
+│   ├── ui/                         # Base UI components
+│   ├── fhe/                        # FHE components
+│   └── [business components]
 ├── lib/
-│   ├── fhevm.ts                    # FHEVM client setup
-│   └── contract.ts                 # Contract utilities
+│   ├── fhe/                        # FHE integration
+│   │   ├── client.ts               # Client operations
+│   │   ├── server.ts               # Server operations
+│   │   └── keys.ts                 # Key management
+│   └── utils/                      # Utility functions
+├── hooks/                          # Custom React hooks
+│   ├── useFHE.ts
+│   └── useEncryption.ts
 ├── hardhat.config.js               # Hardhat configuration
+├── next.config.js                  # Next.js configuration
+└── package.json
+
+### React + Vite Version (Standalone)
+```
+PrivateArtInvestment/
+├── src/
+│   ├── App.tsx                     # Main component
+│   ├── main.tsx                    # Entry point with providers
+│   ├── components/
+│   │   ├── Header.tsx              # Header with wallet
+│   │   ├── StatsDisplay.tsx        # Platform statistics
+│   │   ├── InvestorRegistration.tsx # Registration form
+│   │   ├── InvestmentForm.tsx      # Investment with FHE
+│   │   ├── ArtworkManagement.tsx   # Artwork listing
+│   │   └── ArtworkGallery.tsx      # Gallery display
+│   ├── hooks/
+│   │   └── useContract.ts          # Contract interaction
+│   └── styles/
+│       └── App.css                 # Component styles
+├── contracts/
+│   └── PrivateArtInvestment.sol    # Smart contract
+├── scripts/
+│   └── deploy.js                   # Deployment
+├── index.html                      # Vite entry point
+├── vite.config.ts                  # Vite configuration
+├── tsconfig.json                   # TypeScript config
 └── package.json
 ```
 
@@ -199,10 +269,24 @@ private-art-investment/
 
 ### Installation
 
+**For Next.js Version:**
 ```bash
 # Clone repository
 git clone https://github.com/GustHomenick/FHEArtInvestment.git
 cd FHEArtInvestment
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+**For React + Vite Version:**
+```bash
+# Navigate to the React version
+cd PrivateArtInvestment
 
 # Install dependencies
 npm install
@@ -224,15 +308,17 @@ npm test
 # Deploy to Sepolia
 npm run deploy
 
-# Verify on Etherscan
+# Verify on Etherscan (Next.js version only)
 npm run verify
 ```
 
 ### Frontend Development
 
+**Next.js Version:**
 ```bash
 # Start development server
 npm run dev
+# Opens at http://localhost:3000
 
 # Build for production
 npm run build
@@ -241,10 +327,53 @@ npm run build
 npm start
 ```
 
+**React + Vite Version:**
+```bash
+# Start development server
+npm run dev
+# Opens at http://localhost:3002
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## 🎯 Version Comparison
+
+### Next.js Version vs React + Vite Version
+
+| Feature | Next.js Version | React + Vite Version |
+|---------|----------------|---------------------|
+| **Framework** | Next.js 14 App Router | React 18 + Vite 5 |
+| **Rendering** | SSR + CSR (Hybrid) | CSR (Client-Side) |
+| **API Routes** | Built-in API routes | External API required |
+| **Build Tool** | Next.js (webpack) | Vite (esbuild) |
+| **Dev Server** | Next.js dev server | Vite dev server (faster HMR) |
+| **Production** | Vercel optimized | Static hosting ready |
+| **Complexity** | Advanced architecture | Simplified architecture |
+| **Use Case** | Production apps, SEO | SPAs, rapid development |
+| **Bundle Size** | Larger (more features) | Smaller (minimal) |
+| **Learning Curve** | Steeper | Gentler |
+
+**Choose Next.js if you need:**
+- Server-side rendering
+- API routes and backend logic
+- SEO optimization
+- Production-grade features
+
+**Choose React + Vite if you need:**
+- Fast development with HMR
+- Simple deployment (static hosting)
+- Lightweight bundle
+- Quick prototyping
+
 ## 🔧 Configuration
 
 ### Environment Variables
 
+**For Next.js Version:**
 Create a `.env` file with the following variables:
 
 ```env
@@ -256,9 +385,25 @@ PRIVATE_KEY=your_deployer_private_key
 NEXT_PUBLIC_CONTRACT_ADDRESS=deployed_contract_address
 NEXT_PUBLIC_CHAIN_ID=11155111
 NEXT_PUBLIC_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_id
 
 # Optional
 ETHERSCAN_API_KEY=your_etherscan_key
+```
+
+**For React + Vite Version:**
+Create a `.env` file with the following variables:
+
+```env
+# Network Configuration (for contract deployment)
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
+PRIVATE_KEY=your_deployer_private_key
+
+# Frontend Configuration (Vite uses VITE_ prefix)
+VITE_CONTRACT_ADDRESS=deployed_contract_address
+VITE_CHAIN_ID=11155111
+VITE_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
+VITE_WALLETCONNECT_PROJECT_ID=your_walletconnect_id
 ```
 
 ## 📖 Usage Examples
@@ -493,8 +638,41 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **GitHub Issues**: [Report bugs or request features](https://github.com/GustHomenick/FHEArtInvestment/issues)
 - **Discussions**: [Join community discussions](https://github.com/GustHomenick/FHEArtInvestment/discussions)
 
+## 🎯 Which Version Should I Use?
+
+### Choose Next.js Version if you:
+- ✅ Need server-side rendering (SSR) for better SEO
+- ✅ Want built-in API routes for backend logic
+- ✅ Plan to deploy on Vercel or similar platforms
+- ✅ Need advanced features like middleware and edge functions
+- ✅ Are building a production-grade application
+- ✅ Want the most feature-rich development experience
+
+### Choose React + Vite Version if you:
+- ✅ Want fast Hot Module Replacement (HMR) during development
+- ✅ Prefer a simpler, more straightforward architecture
+- ✅ Need to deploy on static hosting (GitHub Pages, Netlify, etc.)
+- ✅ Are learning React and FHEVM integration
+- ✅ Want a smaller bundle size
+- ✅ Need quick prototyping and faster build times
+- ✅ Prefer client-side only applications
+
+### Feature Parity
+
+Both versions include:
+- ✅ Full FHEVM SDK integration
+- ✅ Encrypted investment functionality
+- ✅ Wallet connection (Wagmi + ConnectKit)
+- ✅ TypeScript support
+- ✅ Same smart contracts
+- ✅ Identical core features
+- ✅ Modern React 18 hooks
+- ✅ Professional UI/UX
+
+The **only differences** are in the build tooling, deployment strategy, and architectural approach.
+
 ---
 
 **Built with ❤️ for privacy-preserving art investment**
 
-*Powered by Zama FHEVM • Deployed on Ethereum Sepolia • Hosted on Vercel*
+*Powered by Zama FHEVM • Available in Next.js and React+Vite • Deployed on Ethereum Sepolia*
